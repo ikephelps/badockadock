@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  memcached:
+    expose:
+      - 11211
+    image: memcached:1.6
+  nginx:
+    depends_on:
+      - php
+    expose:
+      - 80
+      - 443
+    image: nginx:1.18
+    volumes:
+      - ./services/nginx/conf.d/:/etc/nginx/conf.d/:ro
+      - nginx-ssl:/etc/ssl/site:ro
+      - php-src:/var/www/php_src:ro
+  php:
+    build:
+      context: ./services/php/build
+    depends_on:
+      - memcached
+      - redis
+    expose:
+      - 9000
+    volumes:
+      - php-src:/var/www/php_src
+  redis:
+    command: ["redis-server","/etc/redis/redis.conf"]
+    expose:
+      - 6379
+    image: redis:4.0
+    sysctls:
+      net.core.somaxconn: 512
+    volumes:
+      - ./services/redis/redis.conf:/etc/redis/redis.conf:ro
+
+volumes:
+    nginx-ssl:
+        external: true
+    php-src:
+        external: true

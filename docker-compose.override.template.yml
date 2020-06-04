@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+    nginx:
+        ports:
+            - "127.0.0.1:80:80"
+            - "127.0.0.1:443:443"
+
+volumes:
+    nginx-ssl:
+        driver: local
+        driver_opts:
+            type: 'none'
+            o: 'bind'
+            device: '/Users/you/.ssl/your-site'
+    php-src:
+        driver: local
+        driver_opts:
+            type: 'none'
+            o: 'bind'
+            device: '/Users/you/your-project/src'
