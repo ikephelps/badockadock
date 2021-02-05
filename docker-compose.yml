@@ -8,12 +8,13 @@ services:
   nginx:
     depends_on:
       - php
+    env_file: ./services/nginx/nginx.env
     expose:
       - 80
       - 443
-    image: nginx:1.18
+    image: nginx:1.19
     volumes:
-      - ./services/nginx/conf.d/:/etc/nginx/conf.d/:ro
+      - ./services/nginx/templates/:/etc/nginx/templates/
       - nginx-ssl:/etc/ssl/site:ro
       - php-src:/var/www/php_src:ro
   php:
