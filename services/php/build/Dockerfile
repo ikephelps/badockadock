@@ -1,26 +1,27 @@
-FROM php:7.3-fpm
+FROM php:8.0-fpm
 
-RUN apt-get update \
-    && apt-get install -y procps
+RUN apt-get update
 
 ## Core Extensions
 RUN apt-get install -y libpng-dev libxml2-dev libxslt-dev libzip-dev \
-    && docker-php-ext-install gd mysqli pdo_mysql sockets xmlrpc xsl zip
+    && docker-php-ext-install gd mysqli pdo_mysql sockets xsl zip
 
-# PECL Extensions
+## Memcache ##
 RUN apt-get install -y libmemcached-dev memcached \
-    && echo '' | pecl install -o -f memcached \
+    && pecl install -o -f memcached \
     && docker-php-ext-enable memcached
 
-RUN echo '' | pecl install -o -f redis \
+## Redis ##
+RUN pecl install -o -f redis \
     &&  rm -rf /tmp/pear \
     && docker-php-ext-enable redis
 
+## XML-RPC ##
+RUN pecl install -o -f xmlrpc \
+    && docker-php-ext-enable xmlrpc
+
+## Xdebug ##
 RUN pecl install --onlyreqdeps xdebug \
     && docker-php-ext-enable xdebug \
-    && echo "xdebug.default_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.remote_autostart=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.remote_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    && echo "xdebug.mode=develop" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
