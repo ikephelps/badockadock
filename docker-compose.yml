@@ -26,6 +26,7 @@ services:
       - 9000
     volumes:
       - php-src:/var/www/php_src
+    working_dir: /var/www/php_src
   redis:
     command: ["redis-server","/etc/redis/redis.conf"]
     expose:
