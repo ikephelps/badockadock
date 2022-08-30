@@ -2,7 +2,7 @@ version: "3.4"
 
 x-redis-node: &redis-node
   command: redis-server /etc/redis/conf.d/redis.conf
-  image: "redis:6.0-alpine"
+  image: redis:6.0-alpine
   volumes:
     - ./services/redis-cluster/conf.d/:/etc/redis/conf.d/:ro
 
@@ -35,7 +35,7 @@ services:
       - php-src:/var/www/php_src
     working_dir: /var/www/php_src
   redis:
-    command: ["redis-server","/etc/redis/redis.conf"]
+    command: redis-server /etc/redis/redis.conf
     expose:
       - 6379
     image: redis:4.0
@@ -52,7 +52,7 @@ services:
       - redis-node_4
       - redis-node_5
       - redis-node_6
-    image: "redis:6.0-alpine"
+    image: redis:6.0-alpine
   redis-node_1:
     <<: *redis-node
     networks:
