@@ -34,15 +34,6 @@ services:
     volumes:
       - php-src:/var/www/php_src
     working_dir: /var/www/php_src
-  redis:
-    command: redis-server /etc/redis/redis.conf
-    expose:
-      - 6379
-    image: redis:4.0
-    sysctls:
-      net.core.somaxconn: 512
-    volumes:
-      - ./services/redis/redis.conf:/etc/redis/redis.conf:ro
   redis-cluster:
     command: redis-cli --cluster create 172.20.0.31:6379 172.20.0.32:6379 172.20.0.33:6379 172.20.0.34:6379 172.20.0.35:6379 172.20.0.36:6379 --cluster-replicas 1 --cluster-yes
     depends_on:
