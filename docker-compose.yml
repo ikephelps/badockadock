@@ -27,7 +27,6 @@ services:
       context: ./services/php/build
     depends_on:
       - memcached
-      - redis
       - redis-cluster
     expose:
       - 9000
