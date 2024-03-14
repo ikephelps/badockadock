@@ -1,4 +1,10 @@
-version: "3"
+version: "3.4"
+
+x-redis-node: &redis-node
+  command: redis-server /etc/redis/conf.d/redis.conf
+  image: redis:6.0-alpine
+  volumes:
+    - ./services/redis-cluster/conf.d/:/etc/redis/conf.d/:ro
 
 services:
   memcached:
@@ -22,23 +28,62 @@ services:
     depends_on:
       - memcached
       - redis
+      - redis-cluster
     expose:
       - 9000
     volumes:
       - php-src:/var/www/php_src
     working_dir: /var/www/php_src
-  redis:
-    command: ["redis-server","/etc/redis/redis.conf"]
-    expose:
-      - 6379
-    image: redis:4.0
-    sysctls:
-      net.core.somaxconn: 512
-    volumes:
-      - ./services/redis/redis.conf:/etc/redis/redis.conf:ro
+  redis-cluster:
+    command: redis-cli --cluster create 172.20.0.31:6379 172.20.0.32:6379 172.20.0.33:6379 172.20.0.34:6379 172.20.0.35:6379 172.20.0.36:6379 --cluster-replicas 1 --cluster-yes
+    depends_on:
+      - redis-node_1
+      - redis-node_2
+      - redis-node_3
+      - redis-node_4
+      - redis-node_5
+      - redis-node_6
+    image: redis:6.0-alpine
+  redis-node_1:
+    <<: *redis-node
+    networks:
+      default:
+        ipv4_address: 172.20.0.31
+  redis-node_2:
+    <<: *redis-node
+    networks:
+      default:
+        ipv4_address: 172.20.0.32
+  redis-node_3:
+    <<: *redis-node
+    networks:
+      default:
+        ipv4_address: 172.20.0.33
+  redis-node_4:
+    <<: *redis-node
+    networks:
+      default:
+        ipv4_address: 172.20.0.34
+  redis-node_5:
+    <<: *redis-node
+    networks:
+      default:
+        ipv4_address: 172.20.0.35
+  redis-node_6:
+    <<: *redis-node
+    networks:
+      default:
+        ipv4_address: 172.20.0.36
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
 
 volumes:
     nginx-ssl:
-        external: true
+      external: true
     php-src:
-        external: true
+      external: true
