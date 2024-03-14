@@ -31,6 +31,7 @@ services:
       - redis-cluster
     expose:
       - 9000
+      - 9003
     volumes:
       - php-src:/var/www/php_src
     working_dir: /var/www/php_src
