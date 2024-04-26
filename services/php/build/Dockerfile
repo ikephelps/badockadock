@@ -4,8 +4,8 @@ RUN apt-get update \
     && apt-get install -y procps
 
 ## Core Extensions ##
-RUN apt-get install -y libpng-dev libxml2-dev libxslt-dev libzip-dev \
-    && docker-php-ext-install gd pdo_mysql sockets xsl zip
+RUN apt-get install -y libldap-dev libpng-dev libxml2-dev libxslt-dev libzip-dev \
+    && docker-php-ext-install gd ldap pdo_mysql sockets xsl zip
 
 ## Memcache ##
 # libssl-dev is included ot make libmemcached-dev "work"; it's not a requirement
