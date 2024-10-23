@@ -30,6 +30,7 @@ services:
       - 9000
       - 9003
     volumes:
+      - ./services/php/composer/setup.sh:/opt/bin/composer-setup.sh:ro
       - php-src:/var/www/php_src
     working_dir: /var/www/php_src
   redis-cluster:
