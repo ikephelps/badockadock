@@ -1,20 +1,9 @@
-x-redis-node: &redis-node
-  command: redis-server /etc/redis/conf.d/redis.conf
-  image: redis:6.0-alpine
-  volumes:
-    - ./services/redis-cluster/conf.d/:/etc/redis/conf.d/:ro
-
 services:
   memcached:
-    expose:
-      - 11211
     image: memcached:1.6
   nginx:
     depends_on:
       - php
-    expose:
-      - 80
-      - 443
     image: nginx:1.18
     volumes:
       - ./services/nginx/conf.d/:/etc/nginx/conf.d/:ro
@@ -25,61 +14,16 @@ services:
       context: ./services/php/build
     depends_on:
       - memcached
-      - redis-cluster
-    expose:
-      - 9000
-      - 9003
+      - redis
     volumes:
       - ./services/php/composer/setup.sh:/opt/bin/composer-setup.sh:ro
       - php-src:/var/www/php_src
     working_dir: /var/www/php_src
-  redis-cluster:
-    command: redis-cli --cluster create 172.20.0.31:6379 172.20.0.32:6379 172.20.0.33:6379 172.20.0.34:6379 172.20.0.35:6379 172.20.0.36:6379 --cluster-replicas 1 --cluster-yes
-    depends_on:
-      - redis-node_1
-      - redis-node_2
-      - redis-node_3
-      - redis-node_4
-      - redis-node_5
-      - redis-node_6
-    image: redis:6.0-alpine
-  redis-node_1:
-    <<: *redis-node
-    networks:
-      default:
-        ipv4_address: 172.20.0.31
-  redis-node_2:
-    <<: *redis-node
-    networks:
-      default:
-        ipv4_address: 172.20.0.32
-  redis-node_3:
-    <<: *redis-node
-    networks:
-      default:
-        ipv4_address: 172.20.0.33
-  redis-node_4:
-    <<: *redis-node
-    networks:
-      default:
-        ipv4_address: 172.20.0.34
-  redis-node_5:
-    <<: *redis-node
-    networks:
-      default:
-        ipv4_address: 172.20.0.35
-  redis-node_6:
-    <<: *redis-node
-    networks:
-      default:
-        ipv4_address: 172.20.0.36
-
-networks:
-  default:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/24
+  redis:
+    command: redis-server /etc/redis/conf.d/redis.conf
+    image: redis:latest
+    volumes:
+      - ./services/redis/conf.d:/etc/redis/conf.d
 
 volumes:
     nginx-ssl:
